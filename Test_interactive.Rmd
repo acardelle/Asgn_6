@@ -1,20 +1,12 @@
 ---
-title: "Where are the Same-Sex Households?"
 output: html_document
 ---
-Assignment 6 - Spatial Analysis     
-Alex Cardelle     
-October 18, 2021
-```{r setup, include=FALSE, message=FALSE, echo=FALSE, results='hide'}
+
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### Introduction
-This map shows the spatial distribution of the U.S. population living in either a coupled opposite-sex or same-sex households. "Coupled" for this analysis means living in a household with either a married spouse or an unmarried partner present.
-
-Unless otherwise noted, all information was collected from the 2019 American Community Survey (ACS 2019) through the Census API at <http://data.census.gov>.
-
-```{r library, eval=TRUE, echo=TRUE, quiet=FALSE, message=FALSE, results='hide', include=FALSE}
+```{r library, eval=TRUE, echo=FALSE, quiet=FALSE, message=FALSE, results='hide', include=FALSE}
 library(leaflet)
 library(sf)
 library(tidyverse)
@@ -72,31 +64,9 @@ gay_map <-
     opacity = 1)
 ```
 
-**Interactive Map**
 ```{r plot the gays, eval=TRUE, echo=FALSE}
 gay_map
 
-png("lgbt_households.png", width = 5, height = 3, units = "in", res = 300)
-gay_map
-dev.off()
+
 
 ```
-
-``` {r limit the gays, echo=FALSE, eval=FALSE}
-
-limits <- st_bbox(gay_hh)
-
-gay_map2 <- gay_map %>%
-   fitBounds( lng1 = as.numeric(limits[1]),
-                lat1 = as.numeric(limits[2]),
-                lng2 = as.numeric(limits[3]),
-                lat2 = as.numeric(limits[4])) %>%
-   setMaxBounds( lng1 = as.numeric(limits[1]),
-                lat1 = as.numeric(limits[2]),
-                lng2 = as.numeric(limits[3]),
-                lat2 = as.numeric(limits[4])) 
-
-gay_map2
-```
-
-Produced at the Harvard GSD.
