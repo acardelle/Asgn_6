@@ -14,8 +14,6 @@ This map shows the spatial distribution of the U.S. population living in either 
 
 Unless otherwise noted, all information was collected from the 2019 American Community Survey (ACS 2019) through the Census API at <http://data.census.gov>.
 
-**Code Used to Generate Map** 
-
 ```{r library, eval=TRUE, echo=TRUE, quiet=FALSE, message=FALSE, results='hide', include=FALSE}
 library(leaflet)
 library(sf)
@@ -27,7 +25,7 @@ library(htmlwidgets)
 library(tidytransit)
 ```
 
-``` {r ACS gay married map, eval=TRUE, echo=TRUE, quiet=TRUE, message=FALSE, results='hide', warning=FALSE}
+``` {r ACS gay married map, eval=TRUE, echo=FALSE, quiet=TRUE, message=FALSE, results='hide', warning=FALSE}
 
 #load the variables
 
