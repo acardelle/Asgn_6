@@ -1,22 +1,22 @@
 ---
-title: "Asgn6_Miami"
-author: "Alex Cardelle"
-date: "10/15/2021"
+title: "Where are the Same-Sex Households?"
 output: html_document
 ---
-
-```{r setup, include=FALSE}
+Assignment 6 - Spatial Analysis     
+Alex Cardelle     
+October 18, 2021
+```{r setup, include=FALSE, message=FALSE, echo=FALSE, results='hide'}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+### Introduction
+This map shows the spatial distribution of the U.S. population living in either a coupled opposite-sex or same-sex households. "Coupled" for this analysis means living in a household with either a married spouse or an unmarried partner present.
 
-Miami Introduction Text
-<http://rmarkdown.rstudio.com>.
+Unless otherwise noted, all information was collected from the 2019 American Community Survey (ACS 2019) through the Census API at <http://data.census.gov>.
 
-**Knit** 
+**Code Used to Generate Map** 
 
-```{r library, eval=TRUE, echo=FALSE}
+```{r library, eval=TRUE, echo=TRUE, quiet=FALSE, message=FALSE, results='hide', include=FALSE}
 library(leaflet)
 library(sf)
 library(tidyverse)
@@ -27,18 +27,23 @@ library(htmlwidgets)
 library(tidytransit)
 ```
 
-```{r test boston black, eval=FALSE, echo=FALSE}
-acs_vars <- load_variables(2019, "acs1")
+``` {r ACS gay married map, eval=TRUE, echo=TRUE, quiet=TRUE, message=FALSE, results='hide', warning=FALSE}
 
-```
+#load the variables
 
-``` {r ACS gay married map, eval=TRUE, echo=FALSE}
+# B09019_010
+# Estimated total population in households with an opposite-sex spouse present
+# B09019_012
+# Estimate total population in households with an opposite-sex unmarried partner present
+# B09019_011
+# Estimated total population in households with a same-sex spouse present
+# B09019_013
+# Estimate total population in households with a same-sex unmarried partner present
 
-#load the variable
 
-gay_hh <- get_acs(geography = "county",
-                    year = 2019, survey = "acs5",
-                    variables = c(tot_het_ma = "B09019_010",tot_het_um = "B09019_012", tot_gay_ma = "B09019_011", tot_gay_um = "B09019_013"),
+gay_hh <- get_acs(geography = "county", year = 2019, survey = "acs5",
+                    variables = c(tot_het_ma = "B09019_010",tot_het_um = "B09019_012",
+                                  tot_gay_ma = "B09019_011", tot_gay_um = "B09019_013"),
                     output = "wide", geometry = TRUE) 
 
 #mutate the data to eliminate of the margin of error
@@ -49,22 +54,47 @@ gay_hh <- gay_hh %>%
   mutate(pct_gay = round(100 * (tot_gay_maE + tot_gay_umE) / (tot_het_maE + tot_het_umE), 1))
 
 #define the palette
-household_palette <- colorNumeric(c("lightblue", "darkblue"),
+household_palette <- colorNumeric(c("lightgrey", "darkblue"),
                                 gay_hh$pct_gay)
 #plot the map
 gay_map <-
   leaflet(gay_hh) %>%
   addProviderTiles("Stamen.TonerLite") %>%
-  addPolygons(fillColor = ~household_palette(pct_gay), weight = 1, color = "gray", fillOpacity = 0.7,
+  addPolygons(fillColor = ~household_palette(pct_gay), weight = 1, color = "grey", fillOpacity = 0.8,
               highlightOptions = highlightOptions(fillColor = "yellow", fillOpacity = 0.9),
               label = gay_hh$NAME,
-              popup = paste("Total population in coupled households: ", (gay_hh$tot_het_maE+gay_hh$tot_het_umE+gay_hh$tot_gay_maE+gay_hh$tot_gay_umE), "<br/>",
-                            "Total population in coupled same-sex households: ", (gay_hh$tot_gay_maE+gay_hh$tot_gay_umE), " (", 
-                            gay_hh$pct_gay, "%)", sep = "")) %>%
+              popup = paste("Total population in coupled households: ", (gay_hh$tot_het_maE+gay_hh$tot_het_umE+gay_hh$tot_gay_maE+gay_hh$tot_gay_umE),
+                            "<br/>",
+                            "Total population in coupled same-sex households: ",
+                            (gay_hh$tot_gay_maE+gay_hh$tot_gay_umE), " (", 
+                            gay_hh$pct_gay, "%)",sep = "")) %>%
     addLegend("bottomright", pal = household_palette, values = ~pct_gay,
-    title = "Percent of population living in<br/>same-sex households",
+    title = "Percent of the U.S. population<br/> in households living in<br/>same-sex households",
     labFormat = labelFormat(suffix = "%"),
     opacity = 1)
-
-gay_map
 ```
+
+**Interactive Map**
+```{r plot the gays, eval=TRUE, echo=FALSE}
+gay_map
+
+```
+
+``` {r limit the gays, echo=FALSE, eval=FALSE}
+
+limits <- st_bbox(gay_hh)
+
+gay_map2 <- gay_map %>%
+   fitBounds( lng1 = as.numeric(limits[1]),
+                lat1 = as.numeric(limits[2]),
+                lng2 = as.numeric(limits[3]),
+                lat2 = as.numeric(limits[4])) %>%
+   setMaxBounds( lng1 = as.numeric(limits[1]),
+                lat1 = as.numeric(limits[2]),
+                lng2 = as.numeric(limits[3]),
+                lat2 = as.numeric(limits[4])) 
+
+gay_map2
+```
+
+Produced at the Harvard GSD.
